@@ -20,7 +20,6 @@ module.exports = {
   output: {
     filename: `${PATH.assets}/js/[name].[hash].js`,
     path: PATH.dist,
-    publicPath: '/',
   },
   optimization: {
     splitChunks: {
@@ -40,12 +39,12 @@ module.exports = {
       use: ['babel-loader', 'eslint-loader'],
       exclude: '/node_modules/',
     }, {
-      test: /\.(png|jpg|gif|svg)$/,
+      test: /\.(png|jpg|gif|svg|webp)$/,
       loader: 'file-loader',
       options: {
         name: '[name].[ext]',
       },
-    }, {
+    },{
       test: /\.scss$/,
       use: [
         'style-loader',
@@ -56,7 +55,7 @@ module.exports = {
         },
         {
           loader: 'postcss-loader',
-          options: { sourceMap: true, config: { path: './postcss.config.js' } },
+          options: { sourceMap: true, config: { path: './build/postcss.config.js' } },
         },
         {
           loader: 'sass-loader',
@@ -73,7 +72,7 @@ module.exports = {
           options: { sourceMap: true },
         }, {
           loader: 'postcss-loader',
-          options: { sourceMap: true, config: { path: './postcss.config.js' } },
+          options: { sourceMap: true, config: { path: './build/postcss.config.js' } },
         },
       ],
     }],
@@ -86,9 +85,14 @@ module.exports = {
       template: `${PATH.src}/index.html`,
       filename: './index.html',
     }),
-    new CopyWebpackPlugin([
-      { from: `${PATH.src}/img`, to: `${PATH.assets}/img` },
-      { from: `${PATH.src}/static`, to: '' },
+    new CopyWebpackPlugin([{
+      from: `${PATH.src}/img`,
+      to: `${PATH.assets}/img`,
+    },
+    {
+      from: `${PATH.src}/static`,
+      to: '',
+    },
     ]),
   ],
 };
