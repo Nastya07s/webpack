@@ -2,6 +2,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const PATH = {
   src: path.join(__dirname, '../src'),
@@ -36,7 +37,7 @@ module.exports = {
   module: {
     rules: [{
       test: /\.js$/,
-      use: ['babel-loader', 'eslint-loader'],
+      use: ['babel-loader'],
       exclude: '/node_modules/',
     }, {
       test: /\.(png|jpg|gif|svg|webp)$/,
@@ -48,36 +49,31 @@ module.exports = {
       test: /\.scss$/,
       use: [
         'style-loader',
-        MiniCssExtractPlugin.loader,
+        {
+          loader: MiniCssExtractPlugin.loader,
+          options: {
+            esModule: false,
+          },
+        },
         {
           loader: 'css-loader',
           options: { sourceMap: true },
         },
         {
           loader: 'postcss-loader',
-          options: { sourceMap: true, config: { path: './build/postcss.config.js' } },
+          options: { sourceMap: true, postcssOptions: { config: './build/postcss.config.js' } },
         },
         {
           loader: 'sass-loader',
           options: { sourceMap: true },
         },
       ],
-    }, {
-      test: /\.css$/,
-      use: [
-        'style-loader',
-        MiniCssExtractPlugin.loader,
-        {
-          loader: 'css-loader',
-          options: { sourceMap: true },
-        }, {
-          loader: 'postcss-loader',
-          options: { sourceMap: true, config: { path: './build/postcss.config.js' } },
-        },
-      ],
     }],
   },
   plugins: [
+    new ESLintPlugin({
+      extensions: ['ts']
+    }),
     new MiniCssExtractPlugin({
       filename: `${PATH.assets}/css/[name].[contenthash].css`,
     }),
@@ -85,14 +81,15 @@ module.exports = {
       template: `${PATH.src}/index.html`,
       filename: './index.html',
     }),
-    new CopyWebpackPlugin([{
-      from: `${PATH.src}/img`,
-      to: `${PATH.assets}/img`,
-    },
-    {
-      from: `${PATH.src}/static`,
-      to: '',
-    },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: `${PATH.src}/img`,
+        to: `${PATH.assets}/img`,
+      },
+      {
+        from: `${PATH.src}/static`,
+        to: '',
+      }]
+    })
   ],
 };
